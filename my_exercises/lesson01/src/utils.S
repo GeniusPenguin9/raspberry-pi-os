@@ -8,8 +8,8 @@ get32:
 	ldr w0,[x0]
 	ret
 
-.globl delay
-delay:
-	subs x0, x0, #1
-	bne delay
+.globl proc_id
+proc_id:
+	mrs x0, mpidr_el1
+	and x0, x0, #0xFF
 	ret
