@@ -1,7 +1,9 @@
 #ifndef _P_UART_H
 #define _P_UART_H
 
-#define PL011_UART_BASE 0x7E201000
+#include "peripherals/base.h"
+
+#define PL011_UART_BASE     (PBASE+0x00201000)
 
 #define PL011_UART_DR       (PL011_UART_BASE)
 #define PL011_UART_RSRECR   (PL011_UART_BASE + 0X4)

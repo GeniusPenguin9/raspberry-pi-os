@@ -4,21 +4,13 @@
 
 void uart_send ( char c )
 {
-	//To enable transmission, the TXE bit and UARTEN bit must be set to 1
-    while(1) {
-		if(get32(PL011_UART_FR) & (1 << 5))  
-			break;
-	}
+    while(get32(PL011_UART_FR) & (1<<5)) { }
 	put32(PL011_UART_DR, c);
 }
 
 char uart_recv ( void )
 {
-    //To enable reception, the RXE bit and UARTEN bit, must be set to 1
-	while(1) {
-		if(get32(PL011_UART_FR) & (1 << 4))  
-			break;
-	}
+    while(get32(PL011_UART_FR) & (1<<4)) { }
 	return(get32(PL011_UART_DR)&0xFF);
 }
 
@@ -48,10 +40,8 @@ void uart_init ( void )
 	delay(150);
 	put32(GPPUDCLK0,0);
 
-    //disable cr register
-    selector = get32(PL011_UART_CR);
-    selector |= 0;
-    put32(PL011_UART_CR, selector);
+    
+    put32(PL011_UART_CR, 0);                      //disable cr register
     put32(PL011_UART_IMSC, 0);                    // Disable all interrupts 
 
     //set baud rate to 115200
@@ -64,21 +54,8 @@ void uart_init ( void )
     put32(PL011_UART_IBRD, 26);
     put32(PL011_UART_FBRD, 3);
     
-    //when PL011_UART_LCRH reset, all bits are 0, no need clean
-    selector = get32(PL011_UART_LCRH);  
-    selector |= 0<<7;   //disable stick parity select
-    selector |= 0b11<<5;    //word length = 8 bits
-    selector |= 0<<4;       //FIFOS disable
-    selector |= 0<<3;       //one stop bit
-    selector |= 0<<1;       //disable parity
-    selector |= 0;          //after transmission keep high-level
-    put32(PL011_UART_LCRH, selector);
+    put32(PL011_UART_LCRH, (1<<4)|(3<<5));//word length = 8 bits, FIFOS ensable
 
-    //enable cr register
-    selector = get32(PL011_UART_CR);
-    selector |= 1<<9;
-    selector |= 1<<8;
-    selector |= 1;
-    put32(PL011_UART_CR, selector);   
-
+    put32(PL011_UART_IMSC, 0);                  // mask interupts 
+    put32(PL011_UART_CR, (1<<0)|(1<<8)|(1<<9)); //enable cr register
 }
